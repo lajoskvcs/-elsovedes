@@ -28,6 +28,7 @@ float delta = 0;
 
 bool displayLinesAndPoints = true;
 bool displaySurface = true;
+bool surfaceFirst = true;
 
 Point camera = Point(radius * cosf(delta), radius * sinf(delta), magassag);
 
@@ -109,7 +110,7 @@ float b(int i, float t) {
 }
 
 void init (void) {
-    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClearColor (0.0, 0.0, 0.0, 1.0);
     glMatrixMode (GL_PROJECTION);
     gluOrtho2D (0.0, windowWidth, 0.0, windowHeight);
 }
@@ -273,6 +274,9 @@ void keyOperations ( ) {
             camera.setz(magassag);
         }
     }
+    if(keyStates['u']) {
+        surfaceFirst = !surfaceFirst;
+    }
     if(keyStates['p']) {
         displayLinesAndPoints = !displayLinesAndPoints;
     }
@@ -311,48 +315,7 @@ void keyOperations ( ) {
     }
 }
 
-void display( ) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    keyOperations();
-
-    PointH center{0, 0, 0, 1};
-    center = center * M;
-
-    calculateMatrix();
-
-    if(displaySurface) {
-        auto trianglesToWork = triangles;
-
-        int colorIncrement = 0;
-
-        for (auto& triangle: trianglesToWork) {
-            if (triangle.trsf(K).isDrawable()) {
-                if (colorIncrement % 2) {
-                    triangle.setColor(Color(0.3, 0.3, 0.0));
-                } else {
-                    triangle.setColor(Color(0.3, 0.0, 0.3));
-                }
-            } else {
-                if (colorIncrement % 2) {
-                    triangle.setColor(Color(0.6, 0.43, 0.0));
-                } else {
-                    triangle.setColor(Color(0.0, 0.6, 0.43));
-                }
-            }
-
-            colorIncrement++;
-        }
-
-        std::sort(trianglesToWork.begin(), trianglesToWork.end(), [&](Triangle& lhs, Triangle& rhs) {
-            return lhs.trsf(K).distanceFromCamera() > rhs.trsf(K).distanceFromCamera();
-        });
-
-        for (auto triangle: trianglesToWork) {
-            triangle.trsf(M).draw();
-        }
-    }
-
+void displayHelper() {
     if(displayLinesAndPoints) {
         glLineWidth(4.0);
         glColor3f(0.6, 0.2, 0.0);
@@ -387,7 +350,7 @@ void display( ) {
             if(clickedPoint != nullptr && point == *clickedPoint) {
                 glColor3f(1.0,1.0,0.0);
             } else {
-                glColor3f(0.0,0.0,0.0);
+                glColor3f(1.0,1.0,1.0);
             }
             glVertex2f(toDraw.getx(), toDraw.gety());
         }
@@ -403,6 +366,58 @@ void display( ) {
             }
         }
         glEnd();
+    }
+
+}
+
+void display( ) {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    keyOperations();
+
+    PointH center{0, 0, 0, 1};
+    center = center * M;
+
+    calculateMatrix();
+
+    if(!surfaceFirst) {
+        displayHelper();
+    }
+
+    if(displaySurface) {
+        auto trianglesToWork = triangles;
+
+        int colorIncrement = 0;
+
+        for (auto& triangle: trianglesToWork) {
+            if (triangle.trsf(K).isDrawable()) {
+                if (colorIncrement % 2) {
+                    triangle.setColor(Color(0.3, 0.3, 0.0));
+                } else {
+                    triangle.setColor(Color(0.3, 0.0, 0.3));
+                }
+            } else {
+                if (colorIncrement % 2) {
+                    triangle.setColor(Color(0.6, 0.43, 0.0));
+                } else {
+                    triangle.setColor(Color(0.0, 0.6, 0.43));
+                }
+            }
+
+            colorIncrement++;
+        }
+
+        std::sort(trianglesToWork.begin(), trianglesToWork.end(), [&](Triangle& lhs, Triangle& rhs) {
+            return lhs.trsf(K).distanceFromCamera() > rhs.trsf(K).distanceFromCamera();
+        });
+
+        for (auto triangle: trianglesToWork) {
+            triangle.trsf(M).draw();
+        }
+    }
+
+    if(surfaceFirst) {
+        displayHelper();
     }
     glutSwapBuffers( );
 }
