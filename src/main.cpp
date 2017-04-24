@@ -47,38 +47,39 @@ void drawGMTBSpline() {
     
     Matrix matrixM{ 4, 4 };
 
-    matrixM.storage[0][0] = (float) -1.0;
-    matrixM.storage[0][1] = (float) 3.0;
-    matrixM.storage[0][2] = (float) -3.0;
-    matrixM.storage[0][3] = (float) 1.0;
+    matrixM.storage[0][0] = -1.0f;
+    matrixM.storage[0][1] = 3.0f;
+    matrixM.storage[0][2] = -3.0f;
+    matrixM.storage[0][3] = 1.0f;
 
-    matrixM.storage[1][0] = (float) 3.0;
-    matrixM.storage[1][1] = (float) -6.0;
-    matrixM.storage[1][2] = (float) 0.0;
-    matrixM.storage[1][3] = (float) 4.0;
+    matrixM.storage[1][0] = 3.0f;
+    matrixM.storage[1][1] = -6.0f;
+    matrixM.storage[1][2] = 0.0f;
+    matrixM.storage[1][3] = 4.0f;
 
-    matrixM.storage[2][0] = (float) -3.0;
-    matrixM.storage[2][1] = (float) 3.0;
-    matrixM.storage[2][2] = (float) 3.0;
-    matrixM.storage[2][3] = (float) 1.0;
+    matrixM.storage[2][0] = -3.0f;
+    matrixM.storage[2][1] = 3.0f;
+    matrixM.storage[2][2] = 3.0f;
+    matrixM.storage[2][3] = 1.0f;
 
-    matrixM.storage[3][0] = (float) 1.0;
-    matrixM.storage[3][1] = (float) 0.0;
-    matrixM.storage[3][2] = (float) 0.0;
-    matrixM.storage[3][3] = (float) 0.0;
+    matrixM.storage[3][0] = 1.0f;
+    matrixM.storage[3][1] = 0.0f;
+    matrixM.storage[3][2] = 0.0f;
+    matrixM.storage[3][3] = 0.0f;
 
     matrixM = matrixM / 6.0;
 
-    
     Matrix matrixG{ 2, 4 };
     for(int i = 0; i < points.size(); i++) {
-        int indexek[] = {i, i+1, i+2, i+3};
+        int indexek[] = { i, i+1, i+2, i+3 };
 
+        //Make circularity
         for(int j = 0; j < 4; j++) {
             if(points.size() <= indexek[j]) {
                 indexek[j] = indexek[j] - (int) points.size();
             }
         }
+
         matrixG.storage[0][0] = points[indexek[0]].getx();
         matrixG.storage[1][0] = points[indexek[0]].gety();
 
@@ -101,8 +102,8 @@ void drawGMTBSpline() {
 
         for (float t = 0.0; t <= 1.0; t += 0.01) {
             Matrix matrixT{ 4, 1 };
-            matrixT.storage[0][0] = (float) std::pow(t, 3);
-            matrixT.storage[1][0] = (float) std::pow(t, 2);
+            matrixT.storage[0][0] = std::powf(t, 3);
+            matrixT.storage[1][0] = std::powf(t, 2);
             matrixT.storage[2][0] = t;
             matrixT.storage[3][0] = 1;
 
